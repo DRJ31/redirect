@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"log"
 	"os"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 type URLInfo struct {
@@ -13,41 +14,36 @@ type URLInfo struct {
 	Url  string `json:"url"`
 }
 
-func readData() map[string]string {
-	var urlInfos []URLInfo
-	urlMap := make(map[string]string)
-
+func loadURLMap() map[string]string {
 	jsonFile, err := os.Open("urls.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer jsonFile.Close()
 
-	err = json.NewDecoder(jsonFile).Decode(&urlInfos)
-	if err != nil {
+	var urlInfos []URLInfo
+	if err = json.NewDecoder(jsonFile).Decode(&urlInfos); err != nil {
 		log.Fatal(err)
 	}
 
-	for _, urlInfo := range urlInfos {
-		urlMap[urlInfo.Url] = urlInfo.Name
+	urlMap := make(map[string]string, len(urlInfos))
+	for _, u := range urlInfos {
+		urlMap[u.Url] = u.Name
 	}
-
 	return urlMap
 }
 
-func redirectController(ctx *fiber.Ctx) error {
-	urlMap := readData()
-	dst := urlMap[ctx.Hostname()]
-
-	if len(dst) == 0 {
-		return ctx.Redirect("https://uichcc.com")
-	} else {
-		return ctx.Redirect(fmt.Sprintf("https://uichcc.com/%v/", dst))
-	}
-}
-
 func main() {
+	urlMap := loadURLMap()
+
 	app := fiber.New()
-	app.Get("/", redirectController)
-	app.Listen("0.0.0.0:5000")
+	app.Get("/", func(c fiber.Ctx) error {
+		dst := urlMap[c.Hostname()]
+		if dst == "" {
+			return c.Redirect().To("https://uichcc.com")
+		}
+		return c.Redirect().To(fmt.Sprintf("https://uichcc.com/%v/", dst))
+	})
+
+	log.Fatal(app.Listen("0.0.0.0:5000"))
 }
