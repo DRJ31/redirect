@@ -9,6 +9,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "SHA256:N14dawQw0mkucf+EuKqi98Z124GNapu4gc+yKHkaR9M"
+      - setup_remote_docker
       - restore_cache:
           keys:
             - go-mod-v4-{{ checksum "go.sum" }}
