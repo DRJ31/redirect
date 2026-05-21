@@ -40,9 +40,9 @@ func main() {
 	app.Get("/", func(c fiber.Ctx) error {
 		dst := urlMap[c.Hostname()]
 		if dst == "" {
-			return c.Redirect().To("https://uichcc.com")
+			return c.Redirect().To("https://uichcc.app")
 		}
-		return c.Redirect().To(fmt.Sprintf("https://uichcc.com/%v/", dst))
+		return c.Redirect().To(fmt.Sprintf("https://uichcc.app/%v/", dst))
 	})
 
 	log.Fatal(app.Listen("0.0.0.0:5000"))
