@@ -8,5 +8,8 @@
   }, {
     "name": "uic_name_inquiry",
     "url": "names.uichcc.app"
+  }, {
+    "name": "timetable-to-bg",
+    "url": "timetable.uichcc.app"
   }
 ]
